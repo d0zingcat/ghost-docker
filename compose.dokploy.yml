@@ -239,6 +239,7 @@ services:
     restart: no
 
 volumes:
+  ghost:
   tinybird_files:
   tinybird_home:
   traffic_analytics_data:
