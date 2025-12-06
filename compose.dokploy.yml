@@ -26,6 +26,7 @@ services:
       tinybird__tracker__datasource: analytics_events
       tinybird__stats__endpoint: ${TINYBIRD_API_URL:-https://api.tinybird.co}
       mail__transport: ${MAIL_TRANSPORT}
+      mail__options__service: ${MAIL_SERVICE}
       mail__options__host: ${MAIL_HOST}
       mail__options__port: ${MAIL_PORT}
       mail__options__secure: ${MAIL_SECURE}
