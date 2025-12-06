@@ -16,7 +16,7 @@ services:
       url: https://${DOMAIN:?DOMAIN environment variable is required}
       admin__url: ${ADMIN_DOMAIN:+https://${ADMIN_DOMAIN}}
       database__client: mysql
-      database__connection__host: db
+      database__connection__host: ${DATABASE_HOST:-db}
       database__connection__user: ${DATABASE_USER:-ghost}
       database__connection__password: ${DATABASE_PASSWORD:?DATABASE_PASSWORD environment variable is required}
       database__connection__database: ghost
@@ -30,6 +30,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
+        required: false
       tinybird-sync:
         condition: service_completed_successfully
         required: false
@@ -80,6 +81,7 @@ services:
       start_period: 30s
       start_interval: 10s
       retries: 120
+    profiles: [mysql]
     networks:
       - dokploy-network
 
@@ -122,7 +124,7 @@ services:
     environment:
       # See https://github.com/TryGhost/ActivityPub/blob/main/docs/env-vars.md
       NODE_ENV: production
-      MYSQL_HOST: db
+      MYSQL_HOST: ${MYSQL_HOST:-db}
       MYSQL_USER: ${DATABASE_USER:-ghost}
       MYSQL_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD environment variable is required}
       MYSQL_DATABASE: activitypub
@@ -131,6 +133,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
+        required: false
       activitypub-migrate:
         condition: service_completed_successfully
     profiles: [activitypub]
@@ -225,12 +228,13 @@ services:
   activitypub-migrate:
     image: ghcr.io/tryghost/activitypub-migrations:1.1.0@sha256:b3ab20f55d66eb79090130ff91b57fe93f8a4254b446c2c7fa4507535f503662
     environment:
-      MYSQL_DB: mysql://${DATABASE_USER:-ghost}:${DATABASE_PASSWORD:?DATABASE_PASSWORD environment variable is required}@tcp(db:3306)/activitypub
+      MYSQL_DB: mysql://${DATABASE_USER:-ghost}:${DATABASE_PASSWORD:?DATABASE_PASSWORD environment variable is required}@tcp(${MYSQL_HOST:-db}:3306)/activitypub
     networks:
       - dokploy-network
     depends_on:
       db:
         condition: service_healthy
+        required: false
     profiles: [activitypub]
     restart: no
 
